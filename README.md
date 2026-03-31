@@ -15,15 +15,9 @@ Frontend for the Twitch Ads Blocker dashboard.
 - Ads blocking integration
 
 ## Development
-
-Install dependencies:
-
-npm install
-
-Run dev server:
-
-npm run dev
-
-Build project:
-
-npm run build
+    Install dependencies:
+      bun install
+    Run dev server:
+      bun run dev
+    Build project:
+      bun run build
