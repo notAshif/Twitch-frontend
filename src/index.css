@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  --color-twitch-black: #09090b;
+  --color-twitch-dark: #121217;
+  --color-twitch-darker: #0c0c0e;
+  --color-twitch-purple: #9146ff;
+  --color-twitch-purple-hover: #7b2cfa;
+  --color-twitch-border: #212124;
+  --color-twitch-text: #f0f0f0;
+  --color-twitch-text-muted: #a3a3a8;
+}
+
+@layer base {
+  :root {
+    --twitch-purple: #9146ff;
+    --twitch-purple-hover: #7b2cfa;
+    --twitch-black: #09090b;
+    --twitch-dark: #121217;
+    --twitch-darker: #0c0c0e;
+    --twitch-border: #212124;
+    --twitch-text: #f0f0f0;
+    --twitch-text-muted: #a3a3a8;
+    
+    font-family: 'Inter', -apple-system, sans-serif;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-twitch-black text-twitch-text antialiased;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* Custom selection color */
+  ::selection {
+    @apply bg-twitch-purple/20 text-twitch-text;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  }
+}
+
+@layer components {
+  .twitch-card {
+    @apply bg-twitch-dark transition-all duration-300 hover:translate-y-[-2px] border border-white/5 hover:border-twitch-purple/30 rounded-[14px] overflow-hidden shadow-lg shadow-black/20 hover:shadow-twitch-purple/10;
+  }
+  
+  .glass-panel {
+    @apply bg-[#121217]/80 backdrop-blur-xl border border-white/5 shadow-2xl;
+  }
+
+  .twitch-button-primary {
+    @apply bg-twitch-purple hover:bg-twitch-purple-hover text-white font-semibold py-2 px-5 rounded-[10px] transition-all duration-300 shadow-sm active:scale-[0.98] flex items-center justify-center gap-2;
+  }
+
+  .twitch-button-secondary {
+    @apply bg-white/5 hover:bg-white/10 text-twitch-text font-semibold py-2 px-5 rounded-[10px] transition-all duration-300 border border-white/10 active:scale-[0.98] flex items-center justify-center gap-2;
+  }
+
+  .twitch-input {
+    @apply bg-[#121217] border border-white/10 focus:border-twitch-purple/50 focus:ring-4 focus:ring-twitch-purple/10 text-twitch-text rounded-[10px] px-4 py-2.5 outline-none transition-all duration-300 placeholder:text-twitch-text-muted/60;
+  }
+}
+
