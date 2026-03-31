@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import Hls from 'hls.js';
-import { Shield, ShieldAlert, ShieldCheck, X, MessageSquare, RefreshCw, Play, Tv, AlertTriangle, Volume2, VolumeX, Maximize, Pause } from 'lucide-react';
+import { Shield, ShieldAlert, ShieldCheck, X, MessageSquare, RefreshCw, Play, Tv, AlertTriangle, Volume2, VolumeX, Maximize, Pause, Settings, Check } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface ChannelInfo {
   broadcaster_id: string;
@@ -25,6 +26,9 @@ export function WatchPage() {
   const [playerError, setPlayerError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [levels, setLevels] = useState<any[]>([]);
+  const [currentLevel, setCurrentLevel] = useState<number>(-1);
+  const [showQualityMenu, setShowQualityMenu] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -67,13 +71,18 @@ export function WatchPage() {
       hls.loadSource(manifestUrl);
       hls.attachMedia(video);
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
         setIsProtected(true);
         setShieldStatus('Active');
         setPlayerError(null);
+        setLevels(data.levels);
+        setCurrentLevel(hls.currentLevel);
+        toast.success(`Connected to ${channel}'s stream`, { id: 'stream-status' });
+        
         video.play().catch(() => {
           // Autoplay blocked — user needs to click
           setIsPlaying(false);
+          toast('Click to play stream', { icon: '▶️', id: 'autoplay-hint' });
         });
       });
 
@@ -88,13 +97,16 @@ export function WatchPage() {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
               // Try to recover first
+              toast.error('Network connection issues detected', { id: 'network-error' });
               hls.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
+              toast.error('Video decoding error, recovering...', { id: 'media-error' });
               hls.recoverMediaError();
               break;
             default:
               // Unrecoverable — fall back to Twitch embed
+              toast.error('Stream proxy connection lost', { id: 'fatal-error' });
               setPlayerError('Stream proxy connection lost');
               setShieldStatus('Error');
               setUseFallback(true);
@@ -209,6 +221,16 @@ export function WatchPage() {
     }
   };
 
+  const changeQuality = (level: number) => {
+    if (hlsRef.current) {
+      hlsRef.current.currentLevel = level;
+      setCurrentLevel(level);
+      setShowQualityMenu(false);
+      const levelName = level === -1 ? 'Auto' : `${levels[level]?.height}p`;
+      toast.success(`Quality set to ${levelName}`);
+    }
+  };
+
   if (!channel) return null;
 
   return (
@@ -279,7 +301,38 @@ export function WatchPage() {
                     </span>
                   )}
                   
-                  <button onClick={toggleFullscreen} className="text-white hover:text-twitch-purple transition-colors">
+                  
+                  {/* Quality Settings */}
+                  <div className="relative">
+                    <button onClick={() => setShowQualityMenu(!showQualityMenu)} className="text-white hover:text-twitch-purple transition-colors p-1.5 rounded-lg hover:bg-white/5" title="Quality Settings">
+                      <Settings className={`w-5 h-5 ${showQualityMenu ? 'rotate-90' : ''} transition-transform`} />
+                    </button>
+                    
+                    {showQualityMenu && (
+                      <div className="absolute bottom-10 right-0 bg-[#1f1f23] border border-white/10 rounded-xl shadow-2xl p-2 w-48 animate-in slide-in-from-bottom-2 duration-200 z-50">
+                        <p className="text-[10px] font-bold text-twitch-text-muted uppercase tracking-widest px-3 py-2 mb-1 border-b border-white/5">Video Quality</p>
+                        <button 
+                          onClick={() => changeQuality(-1)}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${currentLevel === -1 ? 'bg-twitch-purple/20 text-twitch-purple' : 'text-white hover:bg-white/5'}`}
+                        >
+                          Auto
+                          {currentLevel === -1 && <Check className="w-3.5 h-3.5" />}
+                        </button>
+                        {levels.map((level, idx) => (
+                          <button 
+                            key={idx}
+                            onClick={() => changeQuality(idx)}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${currentLevel === idx ? 'bg-twitch-purple/20 text-twitch-purple' : 'text-white hover:bg-white/5'}`}
+                          >
+                            {level.height}p {level.height >= 1080 ? '(Source)' : ''}
+                            {currentLevel === idx && <Check className="w-3.5 h-3.5" />}
+                          </button>
+                        )).reverse()}
+                      </div>
+                    )}
+                  </div>
+
+                  <button onClick={toggleFullscreen} className="text-white hover:text-twitch-purple transition-colors p-1.5 rounded-lg hover:bg-white/5">
                     <Maximize className="w-5 h-5" />
                   </button>
                 </div>

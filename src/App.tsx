@@ -11,6 +11,8 @@ import { IssuesPage } from './pages/IssuesPage';
 import { WatchPage } from './pages/WatchPage';
 import { CategoryPage } from './pages/CategoryPage';
 
+import { Toaster } from 'react-hot-toast';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
@@ -26,7 +28,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
-  return <Layout>{children}</Layout>;
+  return (
+    <>
+      <Toaster position="top-right" toastOptions={{
+        style: {
+          background: '#1f1f23',
+          color: '#efeff1',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }
+      }} />
+      <Layout>{children}</Layout>
+    </>
+  );
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
