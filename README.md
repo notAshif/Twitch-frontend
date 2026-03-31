@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -71,3 +72,6 @@ export default defineConfig([
   },
 ])
 ```
+=======
+# notAshif-Twitch-ads-blocker-frontend
+>>>>>>> c76b2334fe6faa077e021ac26eb5d70707f6f155
