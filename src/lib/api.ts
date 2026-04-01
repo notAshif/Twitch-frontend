@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const isLocalhost = window.location.hostname === 'localhost';
+const API_BASE = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:3000' : window.location.origin);
 
 class ApiClient {
   private token: string | null = null;
