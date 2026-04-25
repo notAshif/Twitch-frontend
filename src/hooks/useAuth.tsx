@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const login = () => {
-    window.location.href = 'http://localhost:3000/auth/twitch';
+    window.location.href = 'https://twitch-backend-eight.vercel.app/auth/twitch';
   };
 
   const logout = async () => {
